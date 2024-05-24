@@ -1,0 +1,12 @@
+{
+  "name": "blockchainapp",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@github.com:otomoti27/blockchainapp.git",
+  "author": "tomohiro tanaka <tomohiro.tanaka27@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "3.0.0",
+    "hardhat": "2.18.2"
+  }
+}
