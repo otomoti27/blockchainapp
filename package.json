@@ -26,6 +26,7 @@
     "typescript": "^5.4.5"
   },
   "dependencies": {
-    "@openzeppelin/contracts": "4.9.3"
+    "@openzeppelin/contracts": "4.9.3",
+    "seaport": "git+https://github.com/ProjectOpenSea/seaport.git#1.5"
   }
 }
