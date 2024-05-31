@@ -14,11 +14,21 @@ import {
   Text,
   TextInput,
   Title,
+  Image,
+  Badge,
 } from "@mantine/core";
 import { IconCubePlus } from "@tabler/icons-react";
 import { MyERC721, MyERC721__factory } from "@/types";
+import { isError } from "ethers";
 
 const contractAddress = "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0";
+
+type NFT = {
+  tokenId: bigint;
+  name: string;
+  description: string;
+  image: string;
+};
 
 export default function MyNFT() {
   const { signer } = useContext(Web3SignerContext);
@@ -64,6 +74,41 @@ export default function MyNFT() {
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
 
+  // 所有NFTの一覧を取得
+  const [myNFTs, setMyNFTs] = useState<NFT[]>([]);
+  useEffect(() => {
+    const fetchMyNFTs = async () => {
+      const nfts = [];
+      if (myERC721Contract && myERC721Contract.runner) {
+        const myAddress = signer?.getAddress()!;
+        let balance = BigInt(0);
+
+        try {
+          balance = await myERC721Contract.balanceOf(myAddress);
+        } catch (err) {
+          if (isError(err, "BAD_DATA")) {
+            balance = BigInt(0);
+          } else {
+            throw err;
+          }
+        }
+        for (let i = 0; i < balance; i++) {
+          const tokenId = await myERC721Contract.tokenOfOwnerByIndex(myAddress, i);
+          const jsonMetaData = {
+            name: `NFT #${tokenId}`,
+            description:
+              "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+            image: `https://source.unsplash.com/300x200?glass&s=${tokenId}`,
+          };
+          nfts.push({ tokenId, ...jsonMetaData });
+        }
+        setMyNFTs(nfts);
+      }
+    };
+
+    fetchMyNFTs();
+  }, [myERC721Contract, signer]);
+
   return (
     <div>
       <Title order={1} style={{ paddingBottom: 12 }}>
@@ -102,6 +147,23 @@ export default function MyNFT() {
             </Button>
           </Stack>
         </Card>
+        {/* NFT一覧 */}
+        {myNFTs.map((nft, index) => (
+          <Card key={index} shadow="sm" padding="lg" radius="md" withBorder>
+            <Card.Section>
+              <Image src={nft.image} height={160} alt="No image" />
+            </Card.Section>
+            <Group justify="space-between" mt="md" mb="xs">
+              <Text fw={500}>{nft.name}</Text>
+              <Badge color="blue" variant="light">
+                tokenId: {nft.tokenId.toString()}
+              </Badge>
+            </Group>
+            <Text size="sm" c="dimmed">
+              {nft.description}
+            </Text>
+          </Card>
+        ))}
       </SimpleGrid>
     </div>
   );
