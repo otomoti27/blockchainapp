@@ -1,15 +1,23 @@
 import { NavLink } from "@mantine/core";
-import { IconHome2 } from "@tabler/icons-react";
+import { IconCards, IconHome2 } from "@tabler/icons-react";
 import Link from "next/link";
-import { useState } from "react";
+import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 
 export const NavbarLinks = () => {
+  const pathname = usePathname();
   const links = [
     {
       icon: <IconHome2 size={20} />,
       color: "green",
       label: "Home",
       path: "/",
+    },
+    {
+      icon: <IconCards size={20} />,
+      color: "green",
+      label: "My NFT",
+      path: "/mynft",
     },
   ];
 
@@ -25,6 +33,12 @@ export const NavbarLinks = () => {
       onClick={() => setActive(index)}
     />
   ));
+
+  useEffect(() => {
+    const index = links.findIndex((item) => item.path === pathname);
+    setActive(index);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return <div>{linkElements}</div>;
 };
